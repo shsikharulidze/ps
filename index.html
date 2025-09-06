@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shota's Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #333;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+        }
+        
+        .header h1 {
+            font-size: 3rem;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+        
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+        
+        .current-time {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 25px;
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+            text-align: center;
+            margin-bottom: 40px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .time-display {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+        
+        .date-display {
+            color: #666;
+            font-size: 1.1rem;
+        }
+        
+        .apps-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+        
+        .app-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            text-decoration: none;
+            color: inherit;
+            display: block;
+        }
+        
+        .app-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 25px 50px rgba(0,0,0,0.15);
+        }
+        
+        .app-icon {
+            font-size: 3rem;
+            margin-bottom: 20px;
+        }
+        
+        .app-title {
+            font-size: 1.8rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #333;
+        }
+        
+        .app-description {
+            color: #666;
+            font-size: 1rem;
+            line-height: 1.5;
+            margin-bottom: 20px;
+        }
+        
+        .app-features {
+            list-style: none;
+            color: #555;
+            font-size: 0.9rem;
+        }
+        
+        .app-features li {
+            margin-bottom: 8px;
+            position: relative;
+            padding-left: 20px;
+        }
+        
+        .app-features li::before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            color: #4CAF50;
+            font-weight: bold;
+        }
+        
+        .quick-stats {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .stats-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #333;
+            text-align: center;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+        
+        .stat-item {
+            text-align: center;
+            padding: 20px;
+            background: #f8f9ff;
+            border-radius: 15px;
+            border-left: 4px solid #667eea;
+        }
+        
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 5px;
+        }
+        
+        .stat-label {
+            color: #666;
+            font-size: 0.9rem;
+        }
+        
+        .footer {
+            text-align: center;
+            color: rgba(255, 255, 255, 0.8);
+            margin-top: 40px;
+            font-size: 0.9rem;
+        }
+        
+        .version {
+            opacity: 0.7;
+        }
+        
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2.2rem;
+            }
+            
+            .apps-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            
+            .app-card {
+                padding: 25px;
+            }
+            
+            .time-display {
+                font-size: 2rem;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            body {
+                padding: 15px;
+            }
+            
+            .header h1 {
+                font-size: 1.8rem;
+            }
+            
+            .app-card {
+                padding: 20px;
+            }
+            
+            .app-title {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Password Protection -->
+    <div id="loginScreen" style="display: flex; justify-content: center; align-items: center; min-height: 100vh; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+        <div style="background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); padding: 40px; border-radius: 20px; box-shadow: 0 15px 35px rgba(0,0,0,0.1); text-align: center; min-width: 320px;">
+            <h2 style="color: #333; margin-bottom: 20px; font-size: 1.8rem;">🔐 Access Dashboard</h2>
+            <p style="color: #666; margin-bottom: 30px;">Enter password to continue</p>
+            <input type="password" id="passwordInput" placeholder="Password" style="width: 100%; padding: 15px; border: 2px solid #e0e0e0; border-radius: 10px; font-size: 1rem; margin-bottom: 20px; box-sizing: border-box;" onkeypress="if(event.key==='Enter') checkPassword()">
+            <button onclick="checkPassword()" style="width: 100%; padding: 15px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 10px; font-size: 1.1rem; font-weight: 600; cursor: pointer; transition: all 0.3s ease;" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'">Access Dashboard</button>
+            <div id="errorMessage" style="color: #ff4757; margin-top: 15px; font-size: 0.9rem; display: none;">Invalid password. Please try again.</div>
+        </div>
+    </div>
+    
+    <div id="dashboard" class="container" style="display: none;">
+        <div class="header">
+            <h1>🚀 Shota's Dashboard</h1>
+            <p>Your personal productivity hub</p>
+        </div>
+        
+        <div class="current-time">
+            <div class="time-display" id="current-time">--:--</div>
+            <div class="date-display" id="current-date">Loading...</div>
+        </div>
+        
+        <div class="apps-grid">
+            <a href="Class-Schedule/class-schedule.html" class="app-card">
+                <div class="app-icon">📚</div>
+                <div class="app-title">Class Schedule</div>
+                <div class="app-description">
+                    Stay organized with your Fordham University class schedule. Get urgent alerts and never miss a class.
+                </div>
+                <ul class="app-features">
+                    <li>Real-time class alerts (30-min warnings)</li>
+                    <li>Weekly overview with all courses</li>
+                    <li>Professor and room information</li>
+                    <li>Today's schedule highlight</li>
+                </ul>
+            </a>
+            
+            <a href="diet-calendar/diet-calendar.html" class="app-card">
+                <div class="app-icon">🎯</div>
+                <div class="app-title">60-Day Diet Tracker</div>
+                <div class="app-description">
+                    Track your 60-day diet challenge with an interactive calendar and progress tracking.
+                </div>
+                <ul class="app-features">
+                    <li>Interactive calendar with click-to-complete</li>
+                    <li>Progress bar and statistics</li>
+                    <li>Current streak tracking</li>
+                    <li>Local storage saves progress</li>
+                </ul>
+            </a>
+            
+            <a href="livingroom-clinup-schedule/index.html" class="app-card">
+                <div class="app-icon">🏠</div>
+                <div class="app-title">Living Room Cleanup</div>
+                <div class="app-description">
+                    Fair roommate rotation system for living room cleaning duties. Never argue about whose turn it is!
+                </div>
+                <ul class="app-features">
+                    <li>6-person rotation system</li>
+                    <li>Monthly calendar view</li>
+                    <li>Today's assignment display</li>
+                    <li>Copy month functionality</li>
+                </ul>
+            </a>
+        </div>
+        
+        <div class="quick-stats">
+            <div class="stats-title">📊 Quick Stats</div>
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <div class="stat-number" id="next-class">--</div>
+                    <div class="stat-label">Next Class</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number" id="cleanup-person">--</div>
+                    <div class="stat-label">Today's Cleanup</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">60</div>
+                    <div class="stat-label">Diet Challenge Days</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p>Built with ❤️ by Shota | <span class="version">v1.0</span></p>
+            <p>🌟 All your productivity apps in one place</p>
+        </div>
+    </div>
+
+    <script>
+        // Secure password protection
+        const correctPasswordHash = '20ce89da7bb02ade91d734ed4cc45d7e96ce28b8e69ba6582260eb97e7cd2f18'; // SHA-256 of 'ss460'
+        
+        async function hashPassword(password) {
+            const encoder = new TextEncoder();
+            const data = encoder.encode(password);
+            const hash = await crypto.subtle.digest('SHA-256', data);
+            return Array.from(new Uint8Array(hash)).map(b => b.toString(16).padStart(2, '0')).join('');
+        }
+        
+        async function checkPassword() {
+            const inputPassword = document.getElementById('passwordInput').value;
+            const inputHash = await hashPassword(inputPassword);
+            
+            if (inputHash === correctPasswordHash) {
+                document.getElementById('loginScreen').style.display = 'none';
+                document.getElementById('dashboard').style.display = 'block';
+                sessionStorage.setItem('authenticated', 'true');
+            } else {
+                document.getElementById('errorMessage').style.display = 'block';
+                document.getElementById('passwordInput').value = '';
+                setTimeout(() => {
+                    document.getElementById('errorMessage').style.display = 'none';
+                }, 3000);
+            }
+        }
+        
+        // Check if already authenticated in this session
+        if (sessionStorage.getItem('authenticated') === 'true') {
+            document.getElementById('loginScreen').style.display = 'none';
+            document.getElementById('dashboard').style.display = 'block';
+        }
+        
+        // Focus password input on load
+        window.addEventListener('load', () => {
+            if (document.getElementById('loginScreen').style.display !== 'none') {
+                document.getElementById('passwordInput').focus();
+            }
+        });
+
+        // Time display functionality
+        function updateTime() {
+            const now = new Date();
+            document.getElementById('current-time').textContent = now.toLocaleTimeString([], { 
+                hour: '2-digit', 
+                minute: '2-digit',
+                second: '2-digit'
+            });
+            document.getElementById('current-date').textContent = now.toLocaleDateString([], { 
+                weekday: 'long', 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric' 
+            });
+        }
+
+        // Class schedule data (same as in class-schedule.html)
+        const classes = [
+            {
+                instructor: "TBD",
+                days: ["Monday"],
+                startDate: "08/27/2025",
+                endDate: "12/19/2025",
+                startTime: "06:00 PM",
+                endTime: "08:45 PM",
+                location: "Lincoln Center Campus | Leon Lowenstein Bldg.",
+                room: "TBD",
+                subject: "Faith and Reasoning"
+            },
+            {
+                instructor: "TBD",
+                days: ["Monday", "Thursday"],
+                startDate: "08/27/2025",
+                endDate: "12/19/2025",
+                startTime: "10:00 AM",
+                endTime: "11:15 AM",
+                location: "Lincoln Center Campus | Leon Lowenstein Bldg.",
+                room: "TBD",
+                subject: "Finite Math"
+            },
+            {
+                instructor: "TBD",
+                days: ["Tuesday", "Friday"],
+                startDate: "08/27/2025",
+                endDate: "12/19/2025",
+                startTime: "08:30 AM",
+                endTime: "09:45 AM",
+                location: "Lincoln Center Campus | Leon Lowenstein Bldg.",
+                room: "TBD",
+                subject: "Stats 1"
+            },
+            {
+                instructor: "TBD",
+                days: ["Wednesday"],
+                startDate: "08/27/2025",
+                endDate: "12/19/2025",
+                startTime: "02:30 PM",
+                endTime: "05:15 PM",
+                location: "Lincoln Center Campus | Leon Lowenstein Bldg.",
+                room: "Ground Floor",
+                subject: "Ground Floor Class"
+            }
+        ];
+
+        const daysOfWeek = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+
+        function parseTime(timeStr) {
+            const [time, period] = timeStr.split(' ');
+            const [hours, minutes] = time.split(':').map(Number);
+            const date = new Date();
+            date.setHours(period === 'PM' && hours !== 12 ? hours + 12 : hours === 12 && period === 'AM' ? 0 : hours);
+            date.setMinutes(minutes);
+            date.setSeconds(0);
+            date.setMilliseconds(0);
+            return date;
+        }
+
+        function getNextClass() {
+            const now = new Date();
+            const currentDay = daysOfWeek[now.getDay()];
+            
+            // Get today's remaining classes
+            const todaysClasses = classes.filter(c => c.days.includes(currentDay))
+                .map(c => ({ ...c, time: parseTime(c.startTime) }))
+                .filter(c => c.time > now)
+                .sort((a, b) => a.time - b.time);
+            
+            if (todaysClasses.length > 0) {
+                return todaysClasses[0].startTime;
+            }
+            
+            return "None today";
+        }
+
+        // Cleanup person calculation (same logic as livingroom app)
+        const ROOMMATES = ['Shota', 'Justin', 'AP', 'Calvin', 'Edric', 'Winston'];
+        const SEED_DATE = new Date('2025-09-01');
+        
+        function getDayIndexFromDate(date) {
+            const seedTime = SEED_DATE.getTime();
+            const dateTime = new Date(date.getFullYear(), date.getMonth(), date.getDate()).getTime();
+            const diffTime = dateTime - seedTime;
+            const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+            return diffDays;
+        }
+
+        function getAssigneeForDate(date) {
+            const dayIndex = getDayIndexFromDate(date);
+            const roommateIndex = ((dayIndex % ROOMMATES.length) + ROOMMATES.length) % ROOMMATES.length;
+            return ROOMMATES[roommateIndex];
+        }
+
+        function updateStats() {
+            const nextClass = getNextClass();
+            const today = new Date();
+            const cleanupPerson = getAssigneeForDate(today);
+            
+            document.getElementById('next-class').textContent = nextClass;
+            document.getElementById('cleanup-person').textContent = cleanupPerson;
+        }
+
+        // Initialize and update every second
+        function init() {
+            updateTime();
+            updateStats();
+        }
+
+        // Run immediately and then every second
+        init();
+        setInterval(() => {
+            updateTime();
+            updateStats();
+        }, 1000);
+    </script>
+</body>
+</html>

@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>60-Day Diet Tracker</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            padding: 30px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            color: #333;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 1.2em;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 20px;
+            background: #f0f0f0;
+            border-radius: 10px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #4CAF50, #45a049);
+            width: 0%;
+            transition: width 0.3s ease;
+            border-radius: 10px;
+        }
+
+        .progress-text {
+            text-align: center;
+            margin-top: 10px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .day-card {
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            padding: 15px;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            min-height: 80px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .day-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .day-card.completed {
+            background: #d4edda;
+            border-color: #4CAF50;
+            position: relative;
+        }
+
+        .day-card.completed::before {
+            content: '✓';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 3em;
+            color: #4CAF50;
+            font-weight: bold;
+            opacity: 0.8;
+        }
+
+        .day-number {
+            font-size: 1.8em;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .day-label {
+            font-size: 0.9em;
+            color: #666;
+        }
+
+        .completed .day-number,
+        .completed .day-label {
+            opacity: 0.3;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2.5em;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .stat-label {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .reset-btn {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 1em;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: background 0.3s ease;
+        }
+
+        .reset-btn:hover {
+            background: #c82333;
+        }
+
+        @media (max-width: 768px) {
+            .calendar-grid {
+                grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+                gap: 10px;
+            }
+            
+            .day-card {
+                padding: 10px;
+                min-height: 70px;
+            }
+            
+            .day-number {
+                font-size: 1.5em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎯 60-Day Diet Challenge</h1>
+            <p>Click each day to mark it as completed!</p>
+            <a href="../index.html" style="display: inline-block; margin-top: 15px; padding: 10px 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; text-decoration: none; border-radius: 25px; font-size: 0.9rem; font-weight: 600; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 20px rgba(102, 126, 234, 0.4)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 15px rgba(102, 126, 234, 0.3)'">← Back to Dashboard</a>
+        </div>
+
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressFill"></div>
+        </div>
+        <div class="progress-text" id="progressText">0 / 60 days completed (0%)</div>
+
+        <div class="stats">
+            <div class="stat-card">
+                <div class="stat-number" id="completedDays">0</div>
+                <div class="stat-label">Days Completed</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="remainingDays">60</div>
+                <div class="stat-label">Days Remaining</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="streakDays">0</div>
+                <div class="stat-label">Current Streak</div>
+            </div>
+        </div>
+
+        <div class="calendar-grid" id="calendarGrid">
+            <!-- Days will be generated by JavaScript -->
+        </div>
+
+        <center>
+            <button class="reset-btn" onclick="resetProgress()">Reset All Progress</button>
+        </center>
+    </div>
+
+    <script>
+        let completedDays = new Set();
+        
+        // Load saved progress
+        function loadProgress() {
+            const saved = localStorage.getItem('dietProgress');
+            if (saved) {
+                completedDays = new Set(JSON.parse(saved));
+            }
+        }
+
+        // Save progress
+        function saveProgress() {
+            localStorage.setItem('dietProgress', JSON.stringify([...completedDays]));
+        }
+
+        // Generate calendar
+        function generateCalendar() {
+            const grid = document.getElementById('calendarGrid');
+            grid.innerHTML = '';
+            
+            for (let i = 1; i <= 60; i++) {
+                const dayCard = document.createElement('div');
+                dayCard.className = 'day-card';
+                dayCard.setAttribute('data-day', i);
+                
+                if (completedDays.has(i)) {
+                    dayCard.classList.add('completed');
+                }
+                
+                dayCard.innerHTML = `
+                    <div class="day-number">Day ${i}</div>
+                    <div class="day-label">${getDateLabel(i)}</div>
+                `;
+                
+                dayCard.addEventListener('click', () => toggleDay(i));
+                grid.appendChild(dayCard);
+            }
+        }
+
+        // Get date label for day
+        function getDateLabel(dayNumber) {
+            const startDate = new Date();
+            const targetDate = new Date(startDate);
+            targetDate.setDate(startDate.getDate() + dayNumber - 1);
+            
+            return targetDate.toLocaleDateString('en-US', { 
+                month: 'short', 
+                day: 'numeric' 
+            });
+        }
+
+        // Toggle day completion
+        function toggleDay(dayNumber) {
+            const dayCard = document.querySelector(`[data-day="${dayNumber}"]`);
+            
+            if (completedDays.has(dayNumber)) {
+                completedDays.delete(dayNumber);
+                dayCard.classList.remove('completed');
+            } else {
+                completedDays.add(dayNumber);
+                dayCard.classList.add('completed');
+            }
+            
+            saveProgress();
+            updateStats();
+        }
+
+        // Calculate current streak
+        function calculateStreak() {
+            let streak = 0;
+            let dayArray = [...completedDays].sort((a, b) => b - a);
+            
+            if (dayArray.length === 0) return 0;
+            
+            // Check if today (or latest day) is completed
+            let currentDay = Math.max(...dayArray);
+            
+            // Count consecutive days backwards from the highest completed day
+            for (let i = currentDay; i >= 1; i--) {
+                if (completedDays.has(i)) {
+                    streak++;
+                } else {
+                    break;
+                }
+            }
+            
+            return streak;
+        }
+
+        // Update statistics
+        function updateStats() {
+            const completed = completedDays.size;
+            const remaining = 60 - completed;
+            const percentage = Math.round((completed / 60) * 100);
+            const streak = calculateStreak();
+            
+            document.getElementById('completedDays').textContent = completed;
+            document.getElementById('remainingDays').textContent = remaining;
+            document.getElementById('streakDays').textContent = streak;
+            document.getElementById('progressText').textContent = `${completed} / 60 days completed (${percentage}%)`;
+            document.getElementById('progressFill').style.width = `${percentage}%`;
+        }
+
+        // Reset all progress
+        function resetProgress() {
+            if (confirm('Are you sure you want to reset all progress? This cannot be undone.')) {
+                completedDays.clear();
+                localStorage.removeItem('dietProgress');
+                generateCalendar();
+                updateStats();
+            }
+        }
+
+        // Initialize
+        loadProgress();
+        generateCalendar();
+        updateStats();
+    </script>
+</body>
+</html>
